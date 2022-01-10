@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import os
-os.chdir("D:/Onedrive/OneDrive - Danmarks Tekniske Universitet/Python Emotion ai/")
+os.chdir("C:\\Users\\lucas\\Desktop\\Intelligente-Systemer-Projekt\\Python Emotion ai")
 cwd = os.getcwd()
 
 #use download=True if not already downloaded
