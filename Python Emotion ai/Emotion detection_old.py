@@ -18,10 +18,12 @@ test_data = torch.load(cwd+"/test_data.pt")
 
 #trainloader
 train_loader = DataLoader(train_data, batch_size=500)
-test_loader = DataLoader(test_data, batch_size=5000)
+#remember to update accuracy with the batch size
+test_loader = DataLoader(test_data, batch_size=1000)
 
 #middle layer channels, antal feature maps
-mid_layer=100
+mid_layer = 100
+
 
 #Create neural network model using nn.sequential
 net = torch.nn.Sequential(
@@ -40,9 +42,10 @@ loss = torch.nn.CrossEntropyLoss()
 
 optimizer = torch.optim.Adam(net.parameters(), lr=0.0001)
 
-num_epochs = 30
-all_loss = []
-
+num_epochs = 3
+training_loss = []
+test_loss = []
+accuracy = []
 
 
 for epoch in range(num_epochs):
@@ -53,26 +56,35 @@ for epoch in range(num_epochs):
         l.backward()
         optimizer.step()
         
-        all_loss += [l.detach().numpy()]
-        if i%10 == 0:
-            #print(f"loss = {l}")
-            plt.plot(np.array(all_loss))
-            plt.show()
-            all_loss = []
+        training_loss += [l.detach().numpy()]
+        #if i%10 == 0:
+        print(f"training_loss = {l}")
+           # plt.plot(np.array(training_loss))
+            #plt.plot(np.array(test_loss))
+            #plt.show()
             
-        test_loss = 0.
         #for x, y in test_loader:
-         #   out = net(x)
-          #  testl = loss(out, y)
-           # test_loss += testl
+         #   t_out = net(x)
+          #  test_l = loss(t_out, y)
+           # print(f"test_loss = {test_l}")
+            #test_loss += [l.detach().numpy()]
             
-            #print(f"test_loss = {testl}")
+        #print(f"test_loss = {testl}")
         #accuracy
         a, b = next(iter(test_loader))
-        outa = net(a)
-        accuracy = torch.sum(torch.argmax(outa, dim=1) == b)/5000
-        print(accuracy*100)
+        t_out = net(a)
+        accuracy += [torch.sum(torch.argmax(t_out, dim=1) == b)/1000]
         
+        test_l = loss(t_out, b)
+        print(f"test_loss = {test_l}")
+        test_loss += [test_l.detach().numpy()]
+        
+#save model parameters
+torch.save(net.state_dict(), cwd+"/model_parameters.pt")
+#save loss test and training
+np.savetxt(cwd+"/test_loss.csv", test_loss, delimiter=",")
+np.savetxt(cwd+"/training_loss.csv", training_loss, delimiter=",")
+np.savetxt(cwd+"/accuracy.csv", accuracy, delimiter=",")      
 
 
 #test
